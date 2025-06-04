@@ -1,0 +1,167 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  GITHUB_REPOSITORY_OWNER: muehlemann-popp
+  GITHUB_REPOSITORY: django-cookiejwt
+  GIT_SHA:
+    sh: git rev-parse --short=8 HEAD
+  CURRENT_DATETIME:
+    sh: date +"%Y-%m-%d_%H-%M-%S"
+  DIR_SRC: ./src
+  DIR_TESTS: ./tests
+
+tasks:
+  default:
+    desc: Display list of all available tasks
+    cmds:
+      - task --list-all
+    silent: true
+
+  # Local environment
+
+  uv:install:
+    desc: Install dependencies without changes in lock file
+    cmds:
+      - uv sync --frozen -v --all-groups
+
+  uv:install:ci:
+    desc: Install dependencies like in CI pipeline
+    cmds:
+      - uv sync --frozen -v --no-dev
+
+  uv:install:update:
+    desc: Update dependencies with 'uv'
+    cmds:
+      - uv sync --upgrade -v
+
+  install:env:
+    desc: Create .env file from .env.dist template
+    cmds:
+      - |
+        if [ -f .env ]; then
+          echo "File .env already exists. No changes made."
+        else
+          cp .env.dist .env
+        fi
+
+  install:all:
+    desc: Full local project installation
+    cmds:
+      - task: uv:install
+      - task: install:env
+      - task: secretkey:update:local
+
+  # Python Specific
+
+  py:format:src:
+    desc: Format python files in src directory
+    dir: "{{.DIR_SRC}}"
+    cmds:
+      - uv run ruff check --select I --fix
+      - uv run ruff format
+
+  py:format:tests:
+    desc: Format python files in tests directory
+    dir: "{{.DIR_TESTS}}"
+    cmds:
+      - uv run ruff check --select I --fix
+      - uv run ruff format
+
+  py:format:all:
+    desc: Format all Python files in src and tests directories
+    cmds:
+      - task: py:format:src
+      - task: py:format:tests
+
+  checks:mypy:
+    desc: Run mypy check
+    cmds:
+      - uv run mypy {{.DIR_SRC}}
+      - uv run mypy {{.DIR_TESTS}}
+      - uv run mypy --check-untyped-defs {{.DIR_SRC}}/core/models.py
+
+  checks:tests:
+    desc: Run tests
+    cmds:
+      - uv run pytest
+
+  checks:ruff:
+    desc: Run ruff checks
+    cmds:
+      - uv run ruff check --fix
+
+  checks:coverage:
+    desc: Run code coverage check
+    ignore_error: true
+    cmds:
+      - uv run coverage run -m pytest -vv {{.CLI_ARGS}}
+      - uv run coverage xml
+      - uv run coverage html
+      - uv run coverage report
+
+  precommit:
+    desc: Run all checks
+    cmds:
+      - task: py:format:all
+      - task: checks:ruff
+      - task: checks:mypy
+      - task: checks:coverage
+
+  # Django Specific
+
+  manage:
+    desc: Interact with Django's command line interface
+    dir: "{{.DIR_SRC}}"
+    cmds:
+      - uv run python manage.py {{.CLI_ARGS}}
+
+  manage:run:server:
+    desc: Start the backend development server
+    cmds:
+      - task: manage
+        vars:
+          CLI_ARGS: runserver 0.0.0.0:8000
+
+  manage:run:shell:
+    desc: Start python shell connected to project
+    cmds:
+      - task: manage
+        vars:
+          CLI_ARGS: shell
+
+  manage:migrate:
+    desc: Apply migrations
+    cmds:
+      - task: manage
+        vars:
+          CLI_ARGS: migrate
+
+  secretkey:get:
+    desc: Generate a new secret key
+    cmds:
+      - task: manage
+        vars:
+          CLI_ARGS: shell -c "from django.core.management import utils; print(utils.get_random_secret_key())"
+
+  # GitHub CLI
+
+  github:repository:getid:
+    desc: Get repository id with GitHub CLI
+    cmds:
+      - "gh api -H 'Accept: application/vnd.github+json' repos/{{ .GITHUB_REPOSITORY_OWNER }}/{{ .CLI_ARGS | default .GITHUB_REPOSITORY_NAME }} | jq .id"
+
+  # git cli
+
+  git:diff:
+    desc: Prepare git diff for review
+    cmds:
+      - mkdir -p ./var
+      - git diff > ./var/git_diff
+
+  git:diff:main:
+    desc: Prepare comparison between current branch and main branch for review
+    cmds:
+      - mkdir -p ./var
+      - git diff main..HEAD > ./var/git_diff
