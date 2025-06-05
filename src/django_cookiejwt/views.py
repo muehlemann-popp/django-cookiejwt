@@ -31,7 +31,7 @@ from .services import (
 class CookieTokenObtainPairView(TokenViewBase):
     """Returns a pair of JSON web tokens for user authentication."""
 
-    _serializer_class = api_settings.TOKEN_OBTAIN_SERIALIZER
+    serializer_class = CustomTokenObtainPairSerializer
 
     def post(self, request: Request, *args, **kwargs) -> Response:
         response = super().post(request, *args, **kwargs)
