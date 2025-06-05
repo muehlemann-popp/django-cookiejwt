@@ -2,9 +2,9 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.views import TokenBlacklistView, TokenViewBase
 
+from . import conf
 from .serializers import (
     CustomTokenObtainPairSerializer,
     ResponseCustomTokenObtainPairSerializer,
@@ -45,7 +45,8 @@ class CookieTokenObtainPairView(TokenViewBase):
         set_refresh_token_cookie(response, refresh_token)
 
         # Setting a session cookie
-        set_session_cookie(response, request)
+        if conf.COOKIEJWT_SET_SESSION_COOKIE:
+            set_session_cookie(response, request)
 
         # Optionally remove tokens from the response body
         response.data.pop("access", None)

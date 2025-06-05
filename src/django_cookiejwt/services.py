@@ -1,23 +1,17 @@
+from django.conf import settings
+from rest_framework.request import Request
 from rest_framework.response import Response
 
-from .conf import (
-    COOKIEJWT_ACCESS_MAX_AGE,
-    COOKIEJWT_DOMAIN,
-    COOKIEJWT_HTTPONLY,
-    COOKIEJWT_NAME,
-    COOKIEJWT_PATH,
-    COOKIEJWT_SAMESITE,
-    COOKIEJWT_SECURE,
-)
+from . import conf
 
 
 def set_token_cookie(response: Response, key: str, token: str, delete: bool = False) -> None:
     cookie_params = {
         "key": key,
         "value": "" if delete else token,
-        "httponly": COOKIEJWT_HTTPONLY,
-        "secure": COOKIEJWT_SECURE,
-        "samesite": COOKIEJWT_SAMESITE,
+        "httponly": conf.COOKIEJWT_HTTPONLY,
+        "secure": conf.COOKIEJWT_SECURE,
+        "samesite": conf.COOKIEJWT_SAMESITE,
     }
 
     if delete:
@@ -26,15 +20,15 @@ def set_token_cookie(response: Response, key: str, token: str, delete: bool = Fa
     response.set_cookie(**cookie_params)
 
 
-def set_access_token_cookie(response, access_token: str, delete: bool = False) -> None:
+def set_access_token_cookie(response: Response, access_token: str, delete: bool = False) -> None:
     set_token_cookie(response, "access_token", access_token, delete=delete)
 
 
-def set_refresh_token_cookie(response, refresh_token: str, delete: bool = False) -> None:
+def set_refresh_token_cookie(response: Response, refresh_token: str, delete: bool = False) -> None:
     set_token_cookie(response, "refresh_token", refresh_token, delete=delete)
 
 
-def set_session_cookie(response, request) -> None:
+def set_session_cookie(response: Response, request: Request) -> None:
     """
     creates a session and sets the session cookie for the given response
 
@@ -48,17 +42,17 @@ def set_session_cookie(response, request) -> None:
 
     session_id = request.session.session_key
 
-    # set session cookie with proper security settings
+    # set django session cookie with proper security settings
     response.set_cookie(
-        key=COOKIEJWT_NAME,
+        key=settings.SESSION_COOKIE_NAME,
         value=session_id,
-        max_age=COOKIEJWT_ACCESS_MAX_AGE,
+        max_age=settings.SESSION_COOKIE_AGE,
         expires=None,
-        path=COOKIEJWT_PATH,
-        domain=COOKIEJWT_DOMAIN,
-        secure=COOKIEJWT_SECURE,
-        httponly=COOKIEJWT_HTTPONLY,
-        samesite=COOKIEJWT_SAMESITE,
+        path=settings.SESSION_COOKIE_PATH,
+        domain=settings.SESSION_COOKIE_DOMAIN,
+        secure=settings.SESSION_COOKIE_SECURE,
+        httponly=settings.SESSION_COOKIE_HTTPONLY,
+        samesite=settings.SESSION_COOKIE_SAMESITE,
     )
 
     # make sure session is saved
