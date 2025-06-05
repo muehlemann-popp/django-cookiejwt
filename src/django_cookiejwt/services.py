@@ -1,14 +1,23 @@
-from django.conf import settings
 from rest_framework.response import Response
+
+from .conf import (
+    COOKIEJWT_ACCESS_MAX_AGE,
+    COOKIEJWT_DOMAIN,
+    COOKIEJWT_HTTPONLY,
+    COOKIEJWT_NAME,
+    COOKIEJWT_PATH,
+    COOKIEJWT_SAMESITE,
+    COOKIEJWT_SECURE,
+)
 
 
 def set_token_cookie(response: Response, key: str, token: str, delete: bool = False) -> None:
     cookie_params = {
         "key": key,
         "value": "" if delete else token,
-        "httponly": settings.SESSION_COOKIE_HTTPONLY,
-        "secure": settings.SESSION_COOKIE_SECURE,
-        "samesite": settings.SESSION_COOKIE_SAMESITE,
+        "httponly": COOKIEJWT_HTTPONLY,
+        "secure": COOKIEJWT_SECURE,
+        "samesite": COOKIEJWT_SAMESITE,
     }
 
     if delete:
@@ -41,15 +50,15 @@ def set_session_cookie(response, request) -> None:
 
     # set session cookie with proper security settings
     response.set_cookie(
-        key=settings.SESSION_COOKIE_NAME,  # usually "sessionid"
+        key=COOKIEJWT_NAME,
         value=session_id,
-        max_age=settings.SESSION_COOKIE_AGE,
+        max_age=COOKIEJWT_ACCESS_MAX_AGE,
         expires=None,
-        path=settings.SESSION_COOKIE_PATH,
-        domain=settings.SESSION_COOKIE_DOMAIN,
-        secure=settings.SESSION_COOKIE_SECURE,
-        httponly=settings.SESSION_COOKIE_HTTPONLY,
-        samesite=settings.SESSION_COOKIE_SAMESITE,
+        path=COOKIEJWT_PATH,
+        domain=COOKIEJWT_DOMAIN,
+        secure=COOKIEJWT_SECURE,
+        httponly=COOKIEJWT_HTTPONLY,
+        samesite=COOKIEJWT_SAMESITE,
     )
 
     # make sure session is saved
