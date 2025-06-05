@@ -10,11 +10,11 @@ default_app_config = "django_cookiejwt.apps.DjangoCookieJWTConfig"
 
 from .authentication import CookieJWTAuthentication
 from .middlewares import RefreshTokenMiddleware
-from .views import CookieTokenObtainPairView, CookieTokenBlacklistView
+from .views import CookieTokenBlacklistView, CookieTokenObtainPairView
 
 __all__ = [
     "CookieJWTAuthentication",
-    "RefreshTokenMiddleware", 
+    "RefreshTokenMiddleware",
     "CookieTokenObtainPairView",
     "CookieTokenBlacklistView",
 ]

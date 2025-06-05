@@ -1,15 +1,16 @@
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.views import TokenBlacklistView, TokenViewBase
 
-from authentication.serializers import (
+from .serializers import (
     CustomTokenObtainPairSerializer,
     ResponseCustomTokenObtainPairSerializer,
     TokenBlacklistSerializer,
 )
-from authentication.services import (
+from .services import (
     set_access_token_cookie,
     set_refresh_token_cookie,
     set_session_cookie,
@@ -32,7 +33,7 @@ class CookieTokenObtainPairView(TokenViewBase):
 
     _serializer_class = api_settings.TOKEN_OBTAIN_SERIALIZER
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: Request, *args, **kwargs) -> Response:
         response = super().post(request, *args, **kwargs)
 
         # We receive access and refresh tokens
@@ -71,7 +72,7 @@ class CookieTokenObtainPairView(TokenViewBase):
 class CookieTokenBlacklistView(TokenBlacklistView):
     """Places refresh token on blacklist."""
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: Request, *args, **kwargs) -> Response:
         # Getting a refresh token from a cookie
         refresh_token = request.COOKIES.get("refresh_token")
 

@@ -1,4 +1,5 @@
 from django.utils.translation import gettext_lazy as _
+from rest_framework.request import Request
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import AuthenticationFailed, InvalidToken
 from rest_framework_simplejwt.settings import api_settings
@@ -10,7 +11,7 @@ class CookieJWTAuthentication(JWTAuthentication):
         "user_is_inactive": _("The user is inactive"),
     }
 
-    def authenticate(self, request):
+    def authenticate(self, request: Request):
         # Getting access token from cookies
         cookie_access_token = request.COOKIES.get("access_token")
 
@@ -22,9 +23,7 @@ class CookieJWTAuthentication(JWTAuthentication):
 
         try:
             # Validating access token
-            validated_token = self.get_validated_token(
-                cookie_access_token.encode("utf-8")
-            )
+            validated_token = self.get_validated_token(cookie_access_token.encode("utf-8"))
             return self.get_user(validated_token), validated_token
         except Exception:
             raise AuthenticationFailed("Invalid token")

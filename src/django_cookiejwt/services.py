@@ -2,9 +2,7 @@ from django.conf import settings
 from rest_framework.response import Response
 
 
-def set_token_cookie(
-    response: Response, key: str, token: str, delete: bool = False
-) -> None:
+def set_token_cookie(response: Response, key: str, token: str, delete: bool = False) -> None:
     cookie_params = {
         "key": key,
         "value": "" if delete else token,
@@ -23,9 +21,7 @@ def set_access_token_cookie(response, access_token: str, delete: bool = False) -
     set_token_cookie(response, "access_token", access_token, delete=delete)
 
 
-def set_refresh_token_cookie(
-    response, refresh_token: str, delete: bool = False
-) -> None:
+def set_refresh_token_cookie(response, refresh_token: str, delete: bool = False) -> None:
     set_token_cookie(response, "refresh_token", refresh_token, delete=delete)
 
 

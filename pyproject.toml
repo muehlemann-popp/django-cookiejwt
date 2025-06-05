@@ -36,22 +36,7 @@ dependencies = [
     "Django>=4.0",
     "djangorestframework>=3.14.0",
     "djangorestframework-simplejwt>=5.2.0",
-]
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.0",
-    "pytest-django>=4.5.0",
-    "pytest-cov>=4.0",
-    "ruff>=0.1.0",
-    "mypy>=1.0",
-    "django-stubs>=4.2.0",
-    "djangorestframework-stubs>=3.14.0",
-]
-docs = []
-test = [
-    "coverage>=7.0",
-    "tox>=4.0",
+    "drf-spectacular>=0.28.0",
 ]
 
 [project.urls]
@@ -65,14 +50,12 @@ Changelog = "https://github.com/muehlemann-popp/django-cookiejwt/blob/master/CHA
 packages = ["src/django_cookiejwt"]
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "tests.settings"
+# DJANGO_SETTINGS_MODULE = "tests.settings"
 testpaths = ["tests"]
 addopts = "--cov=django_cookiejwt --cov-report=term-missing --cov-report=html"
 
 [tool.ruff]
 line-length = 120
-select = ["E", "F", "I", "N", "W"]
-ignore = ["E501"]
 
 [tool.black]
 line-length = 120
@@ -81,3 +64,18 @@ target-version = ['py312']
 [tool.mypy]
 python_version = "3.12"
 plugins = ["mypy_django_plugin.main"]
+
+[tool.django-stubs]
+strict_settings = false
+ignore_missing_settings = true
+
+[dependency-groups]
+dev = [
+    "coverage>=7.8.2",
+    "django-stubs>=5.2.0",
+    "djangorestframework-stubs>=3.16.0",
+    "pytest>=8.4.0",
+    "pytest-cov>=6.1.1",
+    "pytest-django>=4.11.1",
+    "ruff>=0.11.12",
+]

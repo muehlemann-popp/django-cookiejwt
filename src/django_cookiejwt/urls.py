@@ -1,12 +1,10 @@
 from django.urls import path
 
-from authentication.views import CookieTokenBlacklistView, CookieTokenObtainPairView
+from .views import CookieTokenBlacklistView, CookieTokenObtainPairView
 
 app_name = "authentication"
 
 urlpatterns = [
     path("token/", CookieTokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path(
-        "token/blacklist/", CookieTokenBlacklistView.as_view(), name="token_blacklist"
-    ),
+    path("token/blacklist/", CookieTokenBlacklistView.as_view(), name="token_blacklist"),
 ]

@@ -1,13 +1,17 @@
+from typing import Optional
+
+from django.core.handlers.wsgi import WSGIRequest
 from django.utils.deprecation import MiddlewareMixin
+from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from authentication.authentication import CookieJWTAuthentication
-from authentication.services import set_access_token_cookie
+from .authentication import CookieJWTAuthentication
+from .services import set_access_token_cookie
 
 
 class RefreshTokenMiddleware(MiddlewareMixin):
-    def process_request(self, request):
+    def process_request(self, request: WSGIRequest) -> None:
         # Eliminate requests to the Django admin panel
         if request.path.startswith("/admin/"):
             return None
@@ -30,9 +34,10 @@ class RefreshTokenMiddleware(MiddlewareMixin):
             if refresh_token:
                 new_access_token = self.try_refresh_access_token(refresh_token)
                 request.COOKIES["access_token"] = new_access_token
-                request.new_access_token = new_access_token
+                setattr(request, "new_access_token", new_access_token)
+        return None
 
-    def process_response(self, request, response):
+    def process_response(self, request: WSGIRequest, response: Response) -> Response:
         # If a new access token was generated, we set it in cookies
         new_access_token = getattr(request, "new_access_token", None)
         if new_access_token:
@@ -41,7 +46,7 @@ class RefreshTokenMiddleware(MiddlewareMixin):
         return response
 
     @staticmethod
-    def try_refresh_access_token(refresh_token):
+    def try_refresh_access_token(refresh_token: str) -> Optional[str]:
         """Attempts to update the access token using the refresh token."""
         try:
             refresh = RefreshToken(refresh_token)
