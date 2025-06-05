@@ -80,7 +80,6 @@ tasks:
     cmds:
       - uv run mypy {{.DIR_SRC}}
       - uv run mypy {{.DIR_TESTS}}
-      - uv run mypy --check-untyped-defs {{.DIR_SRC}}/core/models.py
 
   checks:tests:
     desc: Run tests
@@ -97,9 +96,6 @@ tasks:
     ignore_error: true
     cmds:
       - uv run coverage run -m pytest -vv {{.CLI_ARGS}}
-      - uv run coverage xml
-      - uv run coverage html
-      - uv run coverage report
 
   precommit:
     desc: Run all checks

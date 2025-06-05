@@ -18,9 +18,6 @@ class CookieJWTAuthentication(JWTAuthentication):
         if cookie_access_token is None:
             return super().authenticate(request)
 
-        if cookie_access_token is None:
-            return None  # Token not found, consider anonymous user
-
         try:
             # Validating access token
             validated_token = self.get_validated_token(cookie_access_token.encode("utf-8"))

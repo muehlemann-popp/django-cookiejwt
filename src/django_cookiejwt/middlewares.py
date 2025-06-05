@@ -1,55 +1,61 @@
+import logging
 from typing import Optional
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.utils.deprecation import MiddlewareMixin
 from rest_framework.response import Response
-from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from rest_framework_simplejwt.exceptions import AuthenticationFailed, InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .authentication import CookieJWTAuthentication
 from .services import set_access_token_cookie
 
+logger = logging.getLogger(__name__)
+
 
 class RefreshTokenMiddleware(MiddlewareMixin):
     def process_request(self, request: WSGIRequest) -> None:
-        # Eliminate requests to the Django admin panel
         if request.path.startswith("/admin/"):
             return None
 
-        # Getting tokens from cookies
         access_token = request.COOKIES.get("access_token")
         refresh_token = request.COOKIES.get("refresh_token")
 
         if not access_token:
-            return None  # No access token, let's skip the request
+            return None
 
         jwt_authenticator = CookieJWTAuthentication()
 
         try:
-            # Validating access token
-            validated_token = jwt_authenticator.get_validated_token(access_token)
+            validated_token = jwt_authenticator.get_validated_token(access_token.encode("utf-8"))
             request.user = jwt_authenticator.get_user(validated_token)
-        except (InvalidToken, TokenError):
-            # If the access token is invalid, we try to update it using refresh token
+        except (InvalidToken, TokenError, AuthenticationFailed):
             if refresh_token:
-                new_access_token = self.try_refresh_access_token(refresh_token)
-                request.COOKIES["access_token"] = new_access_token
-                setattr(request, "new_access_token", new_access_token)
+                new_access_token_str = self.try_refresh_access_token(refresh_token)
+                setattr(request, "new_access_token", new_access_token_str)
+
+                if new_access_token_str is not None:
+                    try:
+                        validated_new_token = jwt_authenticator.get_validated_token(
+                            new_access_token_str.encode("utf-8")
+                        )
+                        request.user = jwt_authenticator.get_user(validated_new_token)
+                    except (InvalidToken, TokenError, AuthenticationFailed):
+                        logger.warning(
+                            "New access token is invalid after refresh attempt. User remains unauthenticated."
+                        )
         return None
 
     def process_response(self, request: WSGIRequest, response: Response) -> Response:
-        # If a new access token was generated, we set it in cookies
         new_access_token = getattr(request, "new_access_token", None)
-        if new_access_token:
+        if new_access_token and not getattr(response, "is_blacklisted", False):
             set_access_token_cookie(response, new_access_token)
-
         return response
 
     @staticmethod
     def try_refresh_access_token(refresh_token: str) -> Optional[str]:
-        """Attempts to update the access token using the refresh token."""
         try:
-            refresh = RefreshToken(refresh_token)
+            refresh = RefreshToken(refresh_token)  # type: ignore[arg-type]
             return str(refresh.access_token)
         except (InvalidToken, TokenError):
-            return None  # If the refresh token is invalid, return None
+            return None
