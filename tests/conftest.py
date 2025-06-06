@@ -7,12 +7,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User as UserType
 from django.core.handlers.wsgi import WSGIRequest
 from django.test import RequestFactory
-from django.utils import timezone
 from freezegun import freeze_time as _freeze_time
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.test import APIClient
-from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 User = get_user_model()
@@ -44,10 +42,9 @@ def valid_access_token(user: UserType) -> str:
 @pytest.fixture
 def expired_access_token(user: UserType) -> str:
     """Generate an expired access token for the test user."""
-    with patch.object(api_settings, "ACCESS_TOKEN_LIFETIME", timedelta(seconds=-1)):
+    # Patch the api_settings object where it's looked up by the token classes
+    with patch("rest_framework_simplejwt.tokens.api_settings.ACCESS_TOKEN_LIFETIME", timedelta(seconds=-1)):
         token = AccessToken.for_user(user)
-        # Manually set token to be expired
-        token.set_exp(claim="exp", from_time=timezone.now() - timedelta(minutes=10))
         return str(token)
 
 
@@ -61,10 +58,9 @@ def valid_refresh_token(user: UserType) -> str:
 @pytest.fixture
 def expired_refresh_token(user: UserType) -> str:
     """Generate an expired refresh token for the test user."""
-    with patch.object(api_settings, "REFRESH_TOKEN_LIFETIME", timedelta(seconds=-1)):
+    # Patch the api_settings object where it's looked up by the token classes
+    with patch("rest_framework_simplejwt.tokens.api_settings.REFRESH_TOKEN_LIFETIME", timedelta(seconds=-1)):
         token = RefreshToken.for_user(user)
-        # Manually set token to be expired
-        token.set_exp(claim="exp", from_time=timezone.now() - timedelta(days=2))
         return str(token)
 
 
