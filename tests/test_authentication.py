@@ -7,7 +7,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.request import Request
 from rest_framework_simplejwt.exceptions import InvalidToken
 
-from src.django_cookiejwt.authentication import CookieJWTAuthentication
+from django_cookiejwt.authentication import CookieJWTAuthentication  # type: ignore[import]
 
 
 class TestCookieJWTAuthentication:
