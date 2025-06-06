@@ -6,18 +6,16 @@ from . import conf
 
 
 def set_token_cookie(response: Response, key: str, token: str, delete: bool = False) -> None:
-    cookie_params = {
-        "key": key,
-        "value": "" if delete else token,
-        "httponly": conf.COOKIEJWT_HTTPONLY,
-        "secure": conf.COOKIEJWT_SECURE,
-        "samesite": conf.COOKIEJWT_SAMESITE,
-    }
-
-    if delete:
-        cookie_params["max_age"] = 0
-
-    response.set_cookie(**cookie_params)
+    response.set_cookie(
+        key=key,
+        value="" if delete else token,
+        httponly=conf.COOKIEJWT_HTTPONLY,
+        secure=conf.COOKIEJWT_SECURE,
+        samesite=conf.COOKIEJWT_SAMESITE,
+        max_age=0 if delete else None,
+        path=conf.COOKIEJWT_PATH,
+        domain=conf.COOKIEJWT_DOMAIN,
+    )
 
 
 def set_access_token_cookie(response: Response, access_token: str, delete: bool = False) -> None:
@@ -42,18 +40,18 @@ def set_session_cookie(response: Response, request: Request) -> None:
 
     session_id = request.session.session_key
 
-    # set django session cookie with proper security settings
-    response.set_cookie(
-        key=settings.SESSION_COOKIE_NAME,
-        value=session_id,
-        max_age=settings.SESSION_COOKIE_AGE,
-        expires=None,
-        path=settings.SESSION_COOKIE_PATH,
-        domain=settings.SESSION_COOKIE_DOMAIN,
-        secure=settings.SESSION_COOKIE_SECURE,
-        httponly=settings.SESSION_COOKIE_HTTPONLY,
-        samesite=settings.SESSION_COOKIE_SAMESITE,
-    )
+    if session_id is not None:
+        response.set_cookie(
+            key=settings.SESSION_COOKIE_NAME,
+            value=session_id,
+            max_age=settings.SESSION_COOKIE_AGE,
+            expires=None,
+            path=settings.SESSION_COOKIE_PATH,
+            domain=settings.SESSION_COOKIE_DOMAIN,
+            secure=settings.SESSION_COOKIE_SECURE,
+            httponly=settings.SESSION_COOKIE_HTTPONLY,
+            samesite=settings.SESSION_COOKIE_SAMESITE,
+        )
 
     # make sure session is saved
     request.session.save()

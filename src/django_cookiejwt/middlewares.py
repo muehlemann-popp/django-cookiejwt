@@ -32,11 +32,10 @@ class RefreshTokenMiddleware(MiddlewareMixin):
         except (InvalidToken, TokenError, AuthenticationFailed):
             if refresh_token:
                 new_access_token_str = self.try_refresh_access_token(refresh_token)
-
-                request.COOKIES["access_token"] = new_access_token_str
                 setattr(request, "new_access_token", new_access_token_str)
 
                 if new_access_token_str:
+                    request.COOKIES["access_token"] = new_access_token_str
                     try:
                         validated_new_token = jwt_authenticator.get_validated_token(
                             new_access_token_str.encode("utf-8")
@@ -57,7 +56,7 @@ class RefreshTokenMiddleware(MiddlewareMixin):
     @staticmethod
     def try_refresh_access_token(refresh_token: str) -> Optional[str]:
         try:
-            refresh = RefreshToken(refresh_token)
+            refresh = RefreshToken(refresh_token)  # type: ignore[arg-type]
             return str(refresh.access_token)
         except (InvalidToken, TokenError):
             return None

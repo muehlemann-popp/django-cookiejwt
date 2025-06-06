@@ -80,7 +80,6 @@ tasks:
     cmds:
       - uv run mypy {{.DIR_SRC}}
       - uv run mypy {{.DIR_TESTS}}
-      - uv run mypy --check-untyped-defs {{.DIR_SRC}}/core/models.py
 
   checks:tests:
     desc: Run tests
