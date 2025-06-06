@@ -49,7 +49,7 @@ class RefreshTokenMiddleware(MiddlewareMixin):
 
     def process_response(self, request: WSGIRequest, response: Response) -> Response:
         new_access_token = getattr(request, "new_access_token", None)
-        if new_access_token:
+        if new_access_token and not getattr(response, "is_blacklisted", False):
             set_access_token_cookie(response, new_access_token)
         return response
 
