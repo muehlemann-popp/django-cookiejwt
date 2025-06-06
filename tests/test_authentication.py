@@ -2,7 +2,9 @@ from unittest.mock import Mock, patch
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User as UserType
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.request import Request
 from rest_framework_simplejwt.exceptions import InvalidToken
 
 from src.django_cookiejwt.authentication import CookieJWTAuthentication
@@ -12,7 +14,7 @@ class TestCookieJWTAuthentication:
     """Tests for the CookieJWTAuthentication class."""
 
     @pytest.mark.django_db
-    def test_successful_authentication_with_cookie(self, user, valid_access_token, rf_request):
+    def test_successful_authentication_with_cookie(self, user: UserType, valid_access_token: str, rf_request: Request):
         """Test successful authentication using a valid token in cookie."""
         # Setup
         auth = CookieJWTAuthentication()
@@ -25,7 +27,7 @@ class TestCookieJWTAuthentication:
         assert user_auth == user
         assert token is not None
 
-    def test_authentication_with_invalid_token_in_cookie(self, invalid_token, rf_request):
+    def test_authentication_with_invalid_token_in_cookie(self, invalid_token: str, rf_request: Request):
         """Test authentication fails with an invalid token in cookie."""
         # Setup
         auth = CookieJWTAuthentication()
@@ -41,7 +43,13 @@ class TestCookieJWTAuthentication:
     @patch.object(CookieJWTAuthentication, "get_validated_token")
     @patch.object(CookieJWTAuthentication, "get_user")
     def test_fallback_to_standard_auth_without_cookie(
-        self, mock_get_user, mock_get_validated_token, mock_get_raw_token, mock_get_header, rf_request, user
+        self,
+        mock_get_user: Mock,
+        mock_get_validated_token: Mock,
+        mock_get_raw_token: Mock,
+        mock_get_header: Mock,
+        rf_request: Request,
+        user: UserType,
     ):
         """Test fallback to standard auth when no token in cookie."""
         # Setup
@@ -65,7 +73,7 @@ class TestCookieJWTAuthentication:
         mock_get_user.assert_called_once_with(mock_token)
 
     @pytest.mark.django_db
-    def test_authentication_with_expired_token(self, expired_access_token, rf_request):
+    def test_authentication_with_expired_token(self, expired_access_token: str, rf_request: Request):
         """Test authentication fails with an expired token."""
         # Setup
         auth = CookieJWTAuthentication()
@@ -80,7 +88,7 @@ class TestCookieJWTAuthentication:
                 auth.authenticate(rf_request)
 
     @pytest.mark.django_db
-    def test_authentication_with_nonexistent_user(self, valid_access_token, rf_request):
+    def test_authentication_with_nonexistent_user(self, valid_access_token: str, rf_request: Request):
         """Test authentication fails when the token references a nonexistent user."""
         # Setup
         auth = CookieJWTAuthentication()
@@ -97,7 +105,7 @@ class TestCookieJWTAuthentication:
                 auth.authenticate(rf_request)
 
     @pytest.mark.django_db
-    def test_authentication_with_inactive_user(self, inactive_user, valid_access_token, rf_request):
+    def test_authentication_with_inactive_user(self, valid_access_token: str, rf_request: Request):
         """Test authentication fails with a token for an inactive user."""
         # Setup
         auth = CookieJWTAuthentication()
@@ -112,7 +120,7 @@ class TestCookieJWTAuthentication:
                 auth.authenticate(rf_request)
 
     @pytest.mark.django_db
-    def test_authentication_with_token_missing_user_id(self, valid_access_token, rf_request):
+    def test_authentication_with_token_missing_user_id(self, valid_access_token: str, rf_request: Request):
         """Test authentication fails when token has no user_id claim."""
         # Setup
         auth = CookieJWTAuthentication()
