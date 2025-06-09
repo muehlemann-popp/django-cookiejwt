@@ -73,6 +73,7 @@ dev = [
     "django-stubs>=5.2.0",
     "djangorestframework-stubs>=3.16.0",
     "freezegun>=1.5.2",
+    "mypy>=1.16.0",
     "pytest>=8.4.0",
     "pytest-cov>=6.1.1",
     "pytest-django>=4.11.1",
