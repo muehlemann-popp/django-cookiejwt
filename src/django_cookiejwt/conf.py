@@ -14,4 +14,6 @@ COOKIEJWT_REFRESH_MAX_AGE = getattr(settings, "COOKIEJWT_REFRESH_MAX_AGE", 86400
 COOKIEJWT_PATH = getattr(settings, "COOKIEJWT_PATH", "/")
 COOKIEJWT_DOMAIN = getattr(settings, "COOKIEJWT_DOMAIN", None)
 
-COOKIEJWT_SET_SESSION_COOKIE = getattr(settings, "COOKIEJWT_SET_SESSION_COOKIE", True)  # Default is True (do set)
+COOKIEJWT_SET_SESSION_COOKIE = getattr(
+    settings, "COOKIEJWT_SET_SESSION_COOKIE", True
+)  # Controls whether session cookies are created. Defaults to True.
