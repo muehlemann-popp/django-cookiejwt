@@ -1,0 +1,37 @@
+name: Publish to PyPI
+
+on:
+  push:
+    tags:
+      - "v*" # Launch when creating view tags v1.0, v0.1.1 и т.д.
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Build and publish to PyPI
+    runs-on: ubuntu-24.04
+    environment: pypi
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Install the project dependencies
+        run: uv sync --frozen --verbose --all-groups
+
+      - name: Run tests
+        run: uv run pytest
+
+      - name: Build package
+        run: uv run hatch build
+
+      - name: Publish package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
