@@ -105,42 +105,6 @@ tasks:
       - task: checks:mypy
       - task: checks:coverage
 
-  # Django Specific
-
-  manage:
-    desc: Interact with Django's command line interface
-    dir: "{{.DIR_SRC}}"
-    cmds:
-      - uv run python manage.py {{.CLI_ARGS}}
-
-  manage:run:server:
-    desc: Start the backend development server
-    cmds:
-      - task: manage
-        vars:
-          CLI_ARGS: runserver 0.0.0.0:8000
-
-  manage:run:shell:
-    desc: Start python shell connected to project
-    cmds:
-      - task: manage
-        vars:
-          CLI_ARGS: shell
-
-  manage:migrate:
-    desc: Apply migrations
-    cmds:
-      - task: manage
-        vars:
-          CLI_ARGS: migrate
-
-  secretkey:get:
-    desc: Generate a new secret key
-    cmds:
-      - task: manage
-        vars:
-          CLI_ARGS: shell -c "from django.core.management import utils; print(utils.get_random_secret_key())"
-
   # GitHub CLI
 
   github:repository:getid:
