@@ -5,7 +5,7 @@ class CookieJWTAuthenticationScheme(OpenApiAuthenticationExtension):
     target_class = "authentication.authentication.CookieJWTAuthentication"
     name = "JWT via Cookie"
 
-    def get_security_definition(self, auto_schema):
+    def get_security_definition(self, *args, **kwargs):
         return {
             "type": "apiKey",
             "in": "cookie",

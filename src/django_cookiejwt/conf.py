@@ -3,7 +3,7 @@ from typing import Literal, Optional
 from django.conf import settings
 
 COOKIEJWT_HTTPONLY = getattr(settings, "COOKIEJWT_HTTPONLY", True)
-COOKIEJWT_SECURE = getattr(settings, "COOKIEJWT_SECURE", False)  # For development; should be True in production
+COOKIEJWT_SECURE = getattr(settings, "COOKIEJWT_SECURE", True)  # For production; should be False in development
 COOKIEJWT_SAMESITE: Optional[Literal["Lax", "Strict", "None", False]] = getattr(settings, "COOKIEJWT_SAMESITE", "Lax")
 
 COOKIEJWT_NAME = getattr(settings, "COOKIEJWT_NAME", "sessionid")
