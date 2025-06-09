@@ -124,4 +124,4 @@ tasks:
     desc: Prepare comparison between current branch and main branch for review
     cmds:
       - mkdir -p ./var
-      - git diff main..HEAD > ./var/git_diff
+      - git diff master..HEAD > ./var/git_diff
