@@ -40,9 +40,7 @@ jobs:
         run: |
           echo '### tests result' >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          uv run coverage run -m pytest >> $GITHUB_STEP_SUMMARY
-          uv run coverage xml
-          uv run coverage report >> $GITHUB_STEP_SUMMARY
+          uv run coverage run -m pytest -vv >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Type checks
