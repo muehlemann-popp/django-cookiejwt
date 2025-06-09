@@ -1,5 +1,8 @@
 # Django Cookie JWT
 
+[![Python Version](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/release/python-3120/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 JWT authentication using HTTP-only cookies for Django REST Framework.
 
 ## Overview
