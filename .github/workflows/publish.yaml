@@ -31,7 +31,9 @@ jobs:
         run: uv run pytest
 
       - name: Build package
-        run: uv run hatch build
+        run: |
+          uv pip install hatch
+          uv run hatch build
 
       - name: Publish package to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
