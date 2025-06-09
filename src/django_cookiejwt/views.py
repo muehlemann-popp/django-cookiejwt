@@ -2,6 +2,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.views import TokenBlacklistView, TokenViewBase
 
 from . import conf
@@ -80,14 +81,21 @@ class CookieTokenBlacklistView(TokenBlacklistView):
         if refresh_token is None:
             return Response({"error": "Refresh token not provided"}, status=400)
 
-        # Add refresh token to request data
-        request.data["refresh"] = refresh_token
+        # The parent TokenBlacklistView expects the token in the request data.
+        # Create a dictionary with the token to pass to the serializer
+        data = {"refresh": refresh_token}
 
-        # Call the default TokenBlacklistView to handle adding to the blacklist
-        response = super().post(request, *args, **kwargs)
+        serializer = self.get_serializer(data=data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except TokenError as e:
+            raise InvalidToken(e.args[0])
 
-        # Deleting cookies
+        # If validation is successful, the token is blacklisted.
+        # Now, create a response and delete the authentication cookies.
+        response = Response(status=status.HTTP_200_OK)
         set_access_token_cookie(response, "access_token", delete=True)
         set_refresh_token_cookie(response, "refresh_token", delete=True)
+        setattr(response, "is_blacklisted", True)
 
         return response

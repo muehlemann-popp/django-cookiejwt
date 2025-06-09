@@ -34,8 +34,7 @@ class RefreshTokenMiddleware(MiddlewareMixin):
                 new_access_token_str = self.try_refresh_access_token(refresh_token)
                 setattr(request, "new_access_token", new_access_token_str)
 
-                if new_access_token_str:
-                    request.COOKIES["access_token"] = new_access_token_str
+                if new_access_token_str is not None:
                     try:
                         validated_new_token = jwt_authenticator.get_validated_token(
                             new_access_token_str.encode("utf-8")
@@ -49,7 +48,7 @@ class RefreshTokenMiddleware(MiddlewareMixin):
 
     def process_response(self, request: WSGIRequest, response: Response) -> Response:
         new_access_token = getattr(request, "new_access_token", None)
-        if new_access_token:
+        if new_access_token and not getattr(response, "is_blacklisted", False):
             set_access_token_cookie(response, new_access_token)
         return response
 

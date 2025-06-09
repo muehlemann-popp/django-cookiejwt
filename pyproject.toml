@@ -52,7 +52,7 @@ packages = ["src/django_cookiejwt"]
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tests.settings"
 testpaths = ["tests"]
-addopts = "--cov=django_cookiejwt --cov-report=term-missing --cov-report=html"
+addopts = "--cov=django_cookiejwt --cov-report=term-missing --cov-report=xml --cov-report=html"
 pythonpath = ["."]
 
 [tool.ruff]
@@ -72,6 +72,7 @@ dev = [
     "coverage>=7.8.2",
     "django-stubs>=5.2.0",
     "djangorestframework-stubs>=3.16.0",
+    "freezegun>=1.5.2",
     "pytest>=8.4.0",
     "pytest-cov>=6.1.1",
     "pytest-django>=4.11.1",
