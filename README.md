@@ -1,5 +1,6 @@
 # Django Cookie JWT
 
+[![codecov](https://codecov.io/gh/muehlemann-popp/django-cookiejwt/graph/badge.svg?token=XR33TARA8C)](https://codecov.io/gh/muehlemann-popp/django-cookiejwt)
 [![Python Version](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/release/python-3120/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
