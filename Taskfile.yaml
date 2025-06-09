@@ -96,9 +96,6 @@ tasks:
     ignore_error: true
     cmds:
       - uv run coverage run -m pytest -vv {{.CLI_ARGS}}
-      - uv run coverage xml
-      - uv run coverage html
-      - uv run coverage report
 
   precommit:
     desc: Run all checks

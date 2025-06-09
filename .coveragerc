@@ -1,0 +1,20 @@
+[run]
+omit =
+    */.local/*
+    */apps.py
+    */admin.py
+    */journey_tests/*
+    */asgi.py
+    */wsgi.py
+    */settings*
+    */manage.py
+    */streamlit_main.py
+    */migrations/*
+source = src
+relative_files = True
+
+[html]
+directory = coverage-reports
+
+[xml]
+output = coverage-reports/coverage.xml

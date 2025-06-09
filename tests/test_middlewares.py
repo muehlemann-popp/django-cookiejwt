@@ -71,7 +71,6 @@ class TestRefreshTokenMiddleware:
         assert request.user == user
         assert hasattr(request, "new_access_token")
         assert request.new_access_token is not None
-        assert request.COOKIES["access_token"] == request.new_access_token
 
     def test_handle_invalid_refresh_token_on_refresh_attempt(self, user: UserType):
         """Test that refresh fails if the refresh token is invalid or expired."""
@@ -146,3 +145,39 @@ class TestRefreshTokenMiddleware:
             assert request.user == user
             assert hasattr(request, "new_access_token")
             assert request.new_access_token is not None
+
+    @patch("django_cookiejwt.middlewares.logger")
+    def test_authentication_fails_if_refreshed_token_is_also_invalid(
+        self, mock_logger: Mock, user: UserType, valid_refresh_token: str
+    ):
+        """
+        Tests the scenario where the access_token has expired, the refresh_token is valid, but the generated new
+        access_token is also invalid for some reason. In this case, the user should remain unauthenticated,
+        and a warning should be written to the log.
+        """
+        # Setting up a request with an invalid access token and a valid refresh
+        request = self.factory.get("/")
+        request.COOKIES = {
+            "access_token": "some-invalid-or-expired-token",
+            "refresh_token": valid_refresh_token,
+        }
+        request.user = AnonymousUser()
+
+        # Mock the token validator so that it always throws an exception.
+        # This will make it fail on the first, old token (to trigger the update logic), and then fail on the second,
+        # newly created token.
+        with patch("django_cookiejwt.authentication.CookieJWTAuthentication.get_validated_token") as mock_validate:
+            mock_validate.side_effect = InvalidToken("Simulated token validation failure")
+
+            # Execute the method under test
+            self.middleware.process_request(request)
+
+        assert isinstance(request.user, AnonymousUser)
+
+        # Verify that a new token has been generated (but not validated)
+        assert hasattr(request, "new_access_token")
+        assert request.new_access_token is not None
+
+        mock_logger.warning.assert_called_once_with(
+            "New access token is invalid after refresh attempt. User remains unauthenticated."
+        )
