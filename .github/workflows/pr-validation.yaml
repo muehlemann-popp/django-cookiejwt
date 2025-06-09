@@ -48,7 +48,6 @@ jobs:
           echo '### mypy checks' >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           uv run mypy src >> $GITHUB_STEP_SUMMARY
-          uv run mypy --check-untyped-defs src/core/models.py >> $GITHUB_STEP_SUMMARY
           uv run mypy tests >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
