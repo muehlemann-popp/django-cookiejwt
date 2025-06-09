@@ -1,6 +1,7 @@
 # Django Cookie JWT
 
 [![codecov](https://codecov.io/gh/muehlemann-popp/django-cookiejwt/graph/badge.svg?token=XR33TARA8C)](https://codecov.io/gh/muehlemann-popp/django-cookiejwt)
+![Mypy Checked](https://img.shields.io/badge/checked%20with-mypy-blue.svg)
 [![Python Version](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/release/python-3120/)
 [![PyPI version](https://img.shields.io/pypi/v/django-cookiejwt.svg)](https://pypi.org/project/django-cookiejwt/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -79,7 +80,7 @@ Configure cookie behavior in your Django settings:
 ```python
 # Cookie security settings
 COOKIEJWT_HTTPONLY = True          # HTTP-only cookies (recommended)
-COOKIEJWT_SECURE = False           # Set to True in production!
+COOKIEJWT_SECURE = True           # Set to False in development!
 COOKIEJWT_SAMESITE = 'Lax'         # CSRF protection
 
 # Cookie naming and expiration

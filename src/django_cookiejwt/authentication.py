@@ -1,14 +1,14 @@
-from django.utils.translation import gettext_lazy as _
 from rest_framework.request import Request
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import AuthenticationFailed, InvalidToken
 from rest_framework_simplejwt.settings import api_settings
+from rest_framework_simplejwt.tokens import Token
 
 
 class CookieJWTAuthentication(JWTAuthentication):
     default_error_messages = {
-        "user_not_found": _("User not found"),
-        "user_is_inactive": _("The user is inactive"),
+        "user_not_found": "User not found",
+        "user_is_inactive": "The user is inactive",
     }
 
     def authenticate(self, request: Request):
@@ -25,12 +25,12 @@ class CookieJWTAuthentication(JWTAuthentication):
         except Exception:
             raise AuthenticationFailed("Invalid token")
 
-    def get_user(self, validated_token):
+    def get_user(self, validated_token: Token):
         """Finds and returns a user by a validated token."""
         try:
             user_id = validated_token[api_settings.USER_ID_CLAIM]
         except KeyError:
-            raise InvalidToken(_("The token does not contain a user ID."))
+            raise InvalidToken("The token does not contain a user ID.")
 
         try:
             user = self.user_model.objects.get(**{api_settings.USER_ID_FIELD: user_id})

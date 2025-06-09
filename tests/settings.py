@@ -94,7 +94,7 @@ SPECTACULAR_SETTINGS = {
 
 # Cookie settings (plugin uses Django session cookie settings)
 # SESSION_COOKIE_HTTPONLY = True
-# SESSION_COOKIE_SECURE = False # False for HTTP tests
+SESSION_COOKIE_SECURE = False  # False for HTTP tests
 # SESSION_COOKIE_SAMESITE = 'Lax'
 
 # Template settings (may be needed for some DRF views or admin)
@@ -113,3 +113,6 @@ TEMPLATES = [
         },
     },
 ]
+
+# CookieJWT settings
+COOKIEJWT_SECURE = False
