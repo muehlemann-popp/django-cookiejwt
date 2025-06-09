@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "django-cookiejwt"
-version = "0.0.1"
+version = "0.0.2"
 description = "JWT authentication using HTTP-only cookies for Django REST Framework"
 readme = "README.md"
 authors = [
